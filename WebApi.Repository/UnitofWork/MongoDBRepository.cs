@@ -7,17 +7,57 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Data.Entity;
 using System.Linq.Expressions;
+using WepApi.Repository;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace WebApi.Repository.UnitofWork
 {
-    public abstract class MongoDBRepository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Patient
     {
-        protected static IMongoClient _client;
-        protected static IMongoDatabase _database;
+        [BsonElement("_id")]
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public ICollection<Ailment> Ailments { get; set; }
+        public ICollection<Medication> Medications { get; set; }
+    }
 
-        public MongoDBRepository()
+    public class Medication
+    {
+        public string Name { get; set; }
+        public int Dosess { get; set; }
+    }
+
+    public class Ailment
+    {
+        public string Name { get; set; }
+    }
+
+    public abstract class MongoDBRepository<TEntity> 
+    {
+        private readonly MongoDbContext _context;
+
+        public MongoDBRepository(MongoDbContext context)
         {
+            _context = context;
+        }
 
+        public IMongoCollection<TEntity> GetAll()
+        {
+            //string pluralize = TEntity.
+            return _context._database.GetCollection<TEntity>("Patients"); 
+        }
+
+        public async Task Insert(TEntity entity)
+        {
+            IMongoCollection<TEntity> collection = this.GetAll();
+            await collection.InsertOneAsync(entity);
+        }
+
+        public async Task InsertRange(IEnumerable<TEntity> entities)
+        {
+            IMongoCollection<TEntity> collection = this.GetAll();
+            await collection.InsertManyAsync(entities);
         }
 
         public int Count()
@@ -90,10 +130,7 @@ namespace WebApi.Repository.UnitofWork
             throw new NotImplementedException();
         }
 
-        public IQueryable<TEntity> GetAll()
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public IQueryable<TEntity> GetAllPaged(int pageIndex, int pageSize)
         {
@@ -125,15 +162,7 @@ namespace WebApi.Repository.UnitofWork
             throw new NotImplementedException();
         }
 
-        public void Insert(TEntity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InsertRange(IEnumerable<TEntity> entities)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public void Update(TEntity entity)
         {
