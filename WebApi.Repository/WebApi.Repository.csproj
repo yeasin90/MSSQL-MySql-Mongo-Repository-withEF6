@@ -69,11 +69,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MongoDbContext.cs" />
+    <Compile Include="MongoRepository\Ailment.cs" />
+    <Compile Include="MongoRepository\MongoEntity.cs" />
+    <Compile Include="MongoRepository\Medication.cs" />
+    <Compile Include="MongoRepository\MongoDbContext.cs" />
+    <Compile Include="MongoRepository\Patient.cs" />
+    <Compile Include="MongoRepository\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\PatientRepository.cs" />
     <Compile Include="Repository\UserRepository.cs" />
     <Compile Include="UnitofWork\IRepository.cs" />
-    <Compile Include="UnitofWork\MongoDBRepository.cs" />
+    <Compile Include="MongoRepository\MongoDBRepository.cs" />
     <Compile Include="UnitofWork\Repository.cs" />
     <Compile Include="UnitofWork\SortOrder.cs" />
     <Compile Include="UnitofWork\UnitOfWork.cs" />

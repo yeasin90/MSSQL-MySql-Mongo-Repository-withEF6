@@ -5,47 +5,29 @@ using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using System.Data.Entity;
 using System.Linq.Expressions;
-using WepApi.Repository;
+using WebApi.Repository;
 using MongoDB.Bson.Serialization.Attributes;
+using WebApi.Repository.UnitofWork;
 
-namespace WebApi.Repository.UnitofWork
+namespace NoSql.Mongo
 {
-    public class Patient
-    {
-        [BsonElement("_id")]
-        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public ICollection<Ailment> Ailments { get; set; }
-        public ICollection<Medication> Medications { get; set; }
-    }
-
-    public class Medication
-    {
-        public string Name { get; set; }
-        public int Dosess { get; set; }
-    }
-
-    public class Ailment
-    {
-        public string Name { get; set; }
-    }
-
-    public abstract class MongoDBRepository<TEntity> 
+    public abstract class MongoDBRepository<TEntity>  where TEntity : MongoEntity
     {
         private readonly MongoDbContext _context;
+        private readonly string _pluralizeEntity;
 
-        public MongoDBRepository(MongoDbContext context)
+        public MongoDBRepository(DbContext context, string pluralizeEntity)
         {
-            _context = context;
+            _context = (MongoDbContext)context;
+            _pluralizeEntity = pluralizeEntity;
         }
 
         public IMongoCollection<TEntity> GetAll()
         {
-            //string pluralize = TEntity.
-            return _context._database.GetCollection<TEntity>("Patients"); 
+            return _context.DB.GetCollection<TEntity>(_pluralizeEntity); 
         }
 
         public async Task Insert(TEntity entity)
@@ -59,6 +41,12 @@ namespace WebApi.Repository.UnitofWork
             IMongoCollection<TEntity> collection = this.GetAll();
             await collection.InsertManyAsync(entities);
         }
+
+        public TEntity Get(object id)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public int Count()
         {
@@ -125,11 +113,7 @@ namespace WebApi.Repository.UnitofWork
             throw new NotImplementedException();
         }
 
-        public TEntity Get(object id)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         
 
         public IQueryable<TEntity> GetAllPaged(int pageIndex, int pageSize)
